@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Eduardo Lopes       103070
+#Eduardo Lopes     103070
 #Tomás Brás        112665
 
 #declaração de variaveis
