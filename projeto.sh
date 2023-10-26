@@ -5,7 +5,6 @@
 
 #declaração de variaveis
 
-#funções
 input() {
 
     #zona de teste
