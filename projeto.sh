@@ -37,8 +37,8 @@ input() {
                 #fi
                 ;;
             l)
-                printf "%4s %4s" "SIZE" "NAME" 
-                echo " $@"
+                #utilizar o head -n para delimitar o numero de linhas
+                echo "SIZE NAME $@"
                 ;;
             *)
                 echo "Opção inválida! A sair..."
