@@ -12,7 +12,7 @@ input() {
     echo "${@: -1}"
     file=${@: -1}
     du --time $file
-    du --time $file | cut -d " " -f 1 
+    du $file | grep -oE '[0-9.]+'
     #fim de zona
 
     while getopts ":n:r:a:d:s:l" flag; do
@@ -27,9 +27,9 @@ input() {
 
                 ;;
             s)
-                space=$OPTARG
-                echo "$space"
-                #if du $file | cut -b 1 > $space ; then
+                minimo=$OPTARG
+                echo "$minimo"
+                #if du $file | grep -oE '[0-9.]+' > $minimo ; then
                     
                 #else
                     #echo "Tamanho minimo inválido"
