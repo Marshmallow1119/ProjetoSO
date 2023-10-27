@@ -37,7 +37,7 @@ input() {
                 #fi
                 ;;
             l)
-                #utilizar o head -n para delimitar o numero de linhas
+                #utilizar o head -n para delimitar o numero de linhas da tabela
                 echo "SIZE NAME $@"
                 ;;
             *)
