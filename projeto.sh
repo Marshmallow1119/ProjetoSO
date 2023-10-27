@@ -4,31 +4,46 @@
 #Tomás Brás        112665
 
 #declaração de variaveis
- 
+declare total_space
+declare minimo
+declare limite
+declare expressao
+
+#declaração de arrays
+declare -a space_array
+
+function directories() {          #verifica quais dos argumentos são diretotias
+    for i in "$@"; do
+        if [[ -d "$i" ]]; then
+            space "$i"  
+        fi
+    done   
+}
+
 function input() {
 
     #zona de teste
-    echo "$@"    
-    echo -e                                                                 #vai exibir todos os argumentos passados  
-    dir=${@: -1}                                                            #atribui o último argumento á variável file
-    du --time $dir                                                                #printa em bytes e não em kilobytes
-    size_in_bytes=$(du -b $dir | grep -oE '[0-9.]+')                                #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
+    echo "$@"                                                                       #vai exibir todos os argumentos passados
+    echo "${@: -1}"     
+    dir=${@: -1}                                                                    #atribui o último argumento á variável file
+    du --time $dir                                                                  #printa em bytes e não em kilobytes
+    size_in_bytes=$(du $dir | grep -oE '[0-9.]+')                                #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
                                                                                     #size_in_bytes=$((size_in_kilobytes * 1024))
-    oper=""
-    oper="${oper}$1 ${@: -2}"
-    
-    #fim de zona                                
-                                                                                
+     
+    #fim de zona                           
+                                                                                    
     while getopts ":n:r:a:d:s:l" flag; do
         case $flag in
-            n)
-            
+            n)  
+                expressao=$OPTARG
+                #isto é para o print
                 dat=$(stat -c "%y" "$dir" | cut -d ' ' -f1)
                 size=$(du -sh "$dir" | awk '{print $1}')            # Use o comando stat para obter informações detalhadas sobre o arquivo
                 printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$dat" "$oper"
                 find "$dir" -type d -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
-                ;;  
+                ;;
+
             r)
                 ;;
             a)
@@ -39,18 +54,12 @@ function input() {
             s)
                 minimo=$OPTARG
                 echo "$minimo"
-                #if du $file | grep -oE '[0-9.]+' > $minimo ; then
-                    
-                #else
-                    #echo "Tamanho minimo inválido"
-                    #exit 1;
-                #fi
                 ;;
-            l)
+            l)  
+                limite=$OPTARG
                 #utilizar o head -n para delimitar o numero de linhas da tabela
-                echo "SIZE NAME $@"
+                echo "SIZE NAME $(date +%Y%m%d) $@"
                 ;;
-    
             *)
                 echo "Opção inválida! A sair..."
                 exit 1;;
@@ -59,8 +68,35 @@ function input() {
     shift $((OPTIND - 1))
 }
 
+function space() {
+    dires=$(find "$1" -type d )
+    index=0
 
-main(){
+    for i in "${dires[@]}"; do
+        total_space="0"
+        files=$(find "$dires" -type f -size "$minimo" -name "$expressao")
+
+        for k in "${files[@]}"; do
+            if [[ ! -d "$k" ]]; then
+                space=$(du "$k" | grep -oE '[0-9.]+')
+            fi
+            total_space=$(echo "$total_space + $space" | bc)
+        done
+
+        #guardar o valor num array
+        space_array[$index]="$total_space"
+        ((index++))
+    done 
+}
+
+function print() {
+    #nothing yet
+    return 0
+}
+
+function main() {
+    directories "$@"
     input "$@"
 }
-main "$@" 
+
+main "$@"
