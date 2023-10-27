@@ -33,19 +33,19 @@ function input() {
     du --time $dir                                                                  #printa em bytes e não em kilobytes
     size_in_bytes=$(du $dir | grep -oE '[0-9.]+')                                #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
                                                                                     #size_in_bytes=$((size_in_kilobytes * 1024))
-    #oper=""
-    #oper="${oper}${${@: -3} ${@: -2} ${@: -1}}"
-    #ext=${@: -2} 
      
     #fim de zona                           
                                                                                     
     while getopts ":n:r:a:d:s:l" flag; do
         case $flag in
-            n)
-                info_file=$(stat "$dir")                                                 # Use o comando stat para obter informações detalhadas sobre o arquivo
-                date=$(echo "$informacoes" | grep "Modify:" | awk '{print $2, $3}')      #data de modificação do resultado
-                printf "%-10s %-50s %-25s %-10s\n" "SIZE" "NAME" "Modify" "$oper"
-                find "$dir" -type f -name "$ext" -exec du -h {} \; | awk '{print $1, $2}'
+            n)  
+                expressao=$OPTARG
+                #isto é para o print
+                dat=$(stat -c "%y" "$dir" | cut -d ' ' -f1)
+                size=$(du -sh "$dir" | awk '{print $1}')            # Use o comando stat para obter informações detalhadas sobre o arquivo
+                printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$dat" "$oper"
+                find "$dir" -type d -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
+                find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 ;;
 
             r)  
