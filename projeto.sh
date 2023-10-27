@@ -8,6 +8,10 @@ declare total_space
 declare minimo
 declare limite
 declare expressao
+declare reverse=0               #ordenação normal
+declare sort_name=0             #ordenação default dos ficheiros
+declare validation='^[0-9]+$'
+declare date
 
 #declaração de arrays
 declare -a space_array
@@ -44,25 +48,43 @@ function input() {
                 find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 ;;
 
-            r)
+            r)  
+                reverse=1
                 ;;
-            a)
+            a)  
+                sort_name=1
                 ;;
-            d)
-
+            d)  
+                #verifica se a data é válida
+                if date -d "$OPTARG" >/dev/null 2>&1; then
+                    date=$OPTARG
+                else
+                    echo "Data inválida"
+                    exit 1
+                fi
                 ;;
-            s)
-                minimo=$OPTARG
-                echo "$minimo"
+            s)  
+                #verificação se o número é inteiro positivo
+                if [[ $OPTARG =~ $validation ]] && [[ $OPTARG -gt 0 ]]; then
+                    minimo=$OPTARG
+                else
+                    echo "Número inserido inválido"
+                    exit 1
+                fi
                 ;;
             l)  
-                limite=$OPTARG
-                #utilizar o head -n para delimitar o numero de linhas da tabela
-                echo "SIZE NAME $(date +%Y%m%d) $@"
+                #verificação se o número é positivo
+                if [[ $OPTARG -gt 0 ]]; then
+                    limite=$OPTARG
+                else
+                    echo "Número inserido inválido"
+                    exit 1
+                fi
                 ;;
             *)
                 echo "Opção inválida! A sair..."
-                exit 1;;
+                exit 1
+                ;;
         esac
     done
     shift $((OPTIND - 1))
@@ -90,7 +112,23 @@ function space() {
 }
 
 function print() {
-    #nothing yet
+    #utilizar o head -n para delimitar o numero de linhas da tabela
+    :'
+    echo "SIZE NAME $(date +%Y%m%d) $@"
+    if [[ $reverse -eq 1 ]]; then
+        if [[ $sort_name -eq 1 ]]; then
+
+        else
+
+        fi
+    else
+        if [[ $sort_name -eq 1 ]]; then
+
+        else
+
+        fi
+    fi
+    '
     return 0
 }
 
