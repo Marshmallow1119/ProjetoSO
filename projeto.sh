@@ -25,7 +25,7 @@ function input() {
             
                 dat=$(stat -c "%y" "$dir" | cut -d ' ' -f1)
                 size=$(du -sh "$dir" | awk '{print $1}')            # Use o comando stat para obter informações detalhadas sobre o arquivo
-                printf "%-10s %-10s %-10s %-10s\n" "SIZE (KB)" "NAME" "$dat" "$oper"
+                printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$dat" "$oper"
                 find "$dir" -type d -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 ;;  
