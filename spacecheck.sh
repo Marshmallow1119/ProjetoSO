@@ -36,7 +36,6 @@ function input() {
                 find "$dir" -type d -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
                 ;;
-
             r)  
                 reverse=1
                 ;;
