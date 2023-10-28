@@ -24,18 +24,7 @@ function directories() {          #verifica quais dos argumentos são diretotias
     done   
 }
 
-function input() {
-
-    #zona de teste
-    echo "$@"                                                                       #vai exibir todos os argumentos passados
-    echo "${@: -1}"     
-    dir=${@: -1}                                                                    #atribui o último argumento á variável file
-    du --time $dir                                                                  #printa em bytes e não em kilobytes
-    size_in_bytes=$(du $dir | grep -oE '[0-9.]+')                                #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
-                                                                                    #size_in_bytes=$((size_in_kilobytes * 1024))
-     
-    #fim de zona                           
-                                                                                    
+function input() {                                                                                            
     while getopts ":n:r:a:d:s:l" flag; do
         case $flag in
             n)  

@@ -3,6 +3,8 @@
 #Eduardo Lopes     103070
 #Tomás Brás        112665
 
+#para testes de codigo
+
 #declaração de variaveis
 declare total_space
 declare minimo
