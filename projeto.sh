@@ -31,7 +31,7 @@ function input() {
     #zona de teste
     echo "$@"                                                                       #vai exibir todos os argumentos passados
     echo "${@: -1}"     
-    dir=${@: -1}                                                                    #atribui o último argumento á variável file
+                                                                      #atribui o último argumento á variável file
     du --time $dir                                                                  #printa em bytes e não em kilobytes
     size_in_bytes=$(du $dir | grep -oE '[0-9.]+')                                   #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
     #size_in_bytes=$((size_in_kilobytes * 1024))
@@ -42,13 +42,13 @@ function input() {
     while getopts ":n:r:a:d:s:l" flag; do
         case $flag in
             n)  
-                expressao=$OPTARG
-                #isto é para o print
-                print();
+                if [ -n "$OPTARG" ]; then
+                    expressao=$OPTARG
+                fi
                 ;;
-
             r)  
                 reverse=1
+                print
                 ;;
             a)  
                 sort_name=1
@@ -112,27 +112,32 @@ function space() {
 
 function print() {
     #utilizar o head -n para delimitar o numero de linhas da tabela
-    echo "SIZE NAME $(date +%Y%m%d) $@"
-    if [[ $reverse -eq 1 ]]; then
-        if [[ $sort_name -eq 1 ]]; then
-            
+    printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$(date +%Y%m%d)" "$@"
+    if [[ "$#" -ne  0]]; then
+        if [[ $reverse -eq 1 ]]; then
+            if [[ $sort_name -eq 1 ]]; then
+                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn -k1,1 -k2,2
+            else
+                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn
+            fi
         else
-            find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn
-        fi
-    else
-        if [[ $sort_name -eq 1 ]]; then
-             
-        else
-            find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' 
-        fi
+            if [[ $sort_name -eq 1 ]]; then
+                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -k2,2r -k1,1n
+            else
+                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' 
+            fi
+    else 
+        echo "Não foram passados argumentos suficentes"
+        exit 1
     fi
-    '
     return 0
 }
+
 
 function main() {
     directories "$@"
     input "$@"
+    #print > saida.txt
 }
 
 main "$@"
