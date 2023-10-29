@@ -31,9 +31,10 @@ function input() {
     echo "${@: -1}"     
     dir=${@: -1}                                                                    #atribui o último argumento á variável file
     du --time $dir                                                                  #printa em bytes e não em kilobytes
-    size_in_bytes=$(du $dir | grep -oE '[0-9.]+')                                #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
-                                                                                    #size_in_bytes=$((size_in_kilobytes * 1024))
-     
+    size_in_bytes=$(du $dir | grep -oE '[0-9.]+')                                   #size_in_kilobytes=$(du -b "$file" | awk '{print $1}') #alternativa que usa awk(temos de ver qual funciona)
+    #size_in_bytes=$((size_in_kilobytes * 1024))
+    dat=$(stat -c "%y" "$dir" | cut -d ' ' -f1)                                     # Use o comando stat para obter informações detalhadas sobre o arquivo
+    size=$(du -sh "$dir" | awk '{print $1}')    
     #fim de zona                           
                                                                                     
     while getopts ":n:r:a:d:s:l" flag; do
@@ -41,11 +42,7 @@ function input() {
             n)  
                 expressao=$OPTARG
                 #isto é para o print
-                dat=$(stat -c "%y" "$dir" | cut -d ' ' -f1)
-                size=$(du -sh "$dir" | awk '{print $1}')            # Use o comando stat para obter informações detalhadas sobre o arquivo
-                printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$dat" "$oper"
-                find "$dir" -type d -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
-                find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
+                print();
                 ;;
 
             r)  
@@ -113,19 +110,18 @@ function space() {
 
 function print() {
     #utilizar o head -n para delimitar o numero de linhas da tabela
-    :'
     echo "SIZE NAME $(date +%Y%m%d) $@"
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
-
+            
         else
-
+            find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn
         fi
     else
         if [[ $sort_name -eq 1 ]]; then
-
+             
         else
-
+            find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' 
         fi
     fi
     '
