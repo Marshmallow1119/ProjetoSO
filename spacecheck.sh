@@ -79,12 +79,14 @@ function space() {
 
     for i in "${dires[@]}"; do
         total_space=0
-        files=($(find "$i" -type f -size +$minimo -name "$expressao"))
+        files=($(find "$i" -type f -name "$expressao"))
 
         for k in "${files[@]}"; do
             if [[ ! -d "$k" ]]; then
                 space=$(du "$k" | awk '{print $1}' | grep -oE '[0-9.]+')
-                total_space=$(echo "$total_space + $space" | bc)
+                if [[ $space -ge $minimo ]]; then
+                    total_space=$(echo "$total_space + $space" | bc)
+                fi
             fi
         done
 
@@ -122,7 +124,7 @@ function print() {
 function main() {
     input "$@"
     directories "$@"
-    print
+    print "$@"
 }
 
 main "$@"
