@@ -7,11 +7,11 @@
 declare total_space=0
 declare minimo=0
 declare limite=10000
-declare expressao="*"
+declare expressao="*.*"
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
 declare validation='^[0-9]+$'
-declare input_date=0
+declare input_date=$(date +%s)
 
 #declaração de arrays
 declare -A space_array
@@ -79,8 +79,7 @@ function space() {
 
     for i in "${dires[@]}"; do
         total_space=0
-        files=($(find "$i" -type f -name "$expressao" ! -newermt "$date"))
-
+        files=($(find "$i" -type f -name "$expressao" ! -newermt "@$input_date"))
         for k in "${files[@]}"; do
             if [[ ! -d "$k" ]]; then
                 space=$(du "$k" | awk '{print $1}' | grep -oE '[0-9.]+')
@@ -102,21 +101,21 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -rn -k1,1 -k2,2 | head -n "$limite"
+            done | sort -k2,2r | head -n "$limite"
         else
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -rn | head -n "$limite"
+            done | sort -k1,1n | head -n "$limite"
         fi
     else
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -k2,2 -r -k1,1 | head -n "$limite"
+            done | sort -k2,2 | head -n "$limite"
         else
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | head -n "$limite"
+            done | sort -k1,1nr | head -n "$limite"
         fi
     fi
 }
