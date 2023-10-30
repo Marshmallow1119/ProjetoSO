@@ -18,11 +18,15 @@ declare date
 #declaração de arrays
 declare -a space_array
 
-function directories() {          #verifica quais dos argumentos são diretotias
-    for i in "$@"; do
-        if [[ -d "$i" ]]; then
-            space "$i"  
-        fi
+function directories() {  
+    if [ $@ -gt 0 ]; then        #verifica quais dos argumentos são diretotias
+        for i in "$@"; do
+            if [[ -d "$i" ]]; then
+                space "$i"  
+            fi
+    else
+        
+    fi 
     done   
 }
 
@@ -48,7 +52,6 @@ function input() {
                 ;;
             r)  
                 reverse=1
-                print
                 ;;
             a)  
                 sort_name=1
@@ -127,7 +130,7 @@ function print() {
                 find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' 
             fi
     else 
-        echo "Não foram passados argumentos suficentes"
+        
         exit 1
     fi
     return 0
@@ -135,8 +138,9 @@ function print() {
 
 
 function main() {
-    directories "$@"
     input "$@"
+    directories "$@"
+    print
     #print > saida.txt
 }
 
