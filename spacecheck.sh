@@ -7,16 +7,20 @@
 declare total_space=0
 declare minimo=0
 declare limite=10000
-declare expressao="*.*"
+declare expressao="*"
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
 declare validation='^[0-9]+$'
 declare input_date=$(date +%s)
 
+#variavel para ficheiros com espaço no nome
+IFS=$'\n'
+
 #declaração de arrays
 declare -A space_array
 
-function directories() {          #verifica quais dos argumentos são diretotias
+#verifica quais dos argumentos são diretotias
+function directories() {          
     for i in "$@"; do
         if [[ -d "$i" ]]; then
             space "$i"  
@@ -24,6 +28,7 @@ function directories() {          #verifica quais dos argumentos são diretotias
     done   
 }
 
+#verificação e leitura das flags passadas como argumentos
 function input() {                                                                                            
     while getopts "n:rad:s:l:" flag; do
         case $flag in
@@ -40,9 +45,8 @@ function input() {
                 ;;
             d)  
                 #verifica se a data é válida
-                if date -d "$OPTARG" >/dev/null 2>&1; then
-                    input_date=$OPTARG
-                else
+                input_date=$(date -d "$OPTARG" +%s 2>/dev/null)
+                if [[ -z $input_date ]]; then
                     echo "Data inválida"
                     exit 1
                 fi
@@ -74,28 +78,34 @@ function input() {
     shift $((OPTIND - 1))
 }
 
+#calculo do espaço ocupado pelos ficheiros de um diretório
 function space() {
     dires=($(find "$1" -type d))
 
-    for i in "${dires[@]}"; do
+    while IFS= read -r -d '' dir; do
         total_space=0
-        files=($(find "$i" -type f -name "$expressao" ! -newermt "@$input_date"))
-        for k in "${files[@]}"; do
-            if [[ ! -d "$k" ]]; then
-                space=$(du "$k" | awk '{print $1}' | grep -oE '[0-9.]+')
+        while IFS= read -r -d '' file; do
+            if [[ ! -d "$file" ]]; then
+                space=$(du "$file" | awk '{print $1}' | grep -oE '[0-9.]+')
                 if [[ $space -ge $minimo ]]; then
                     total_space=$(echo "$total_space + $space" | bc)
                 fi
             fi
-        done
-
-        # Save the value in an array
-        space_array["$i"]=$total_space
-    done 
+        done < <(find "$dir" -type f -name "$expressao" ! -newermt "@$input_date" -print0)
+        
+        # Guardar os valores num array
+        space_array["$dir"]=$total_space
+    done < <(find "$1" -type d -print0)
 }
 
 function print() {
-    # Use head -n to limit the number of lines in the table
+    #verificação se passou algum diretório como argumento
+    if [[ "${#space_array[@]}" -eq 0 ]]; then 
+        echo "Precisa de passar um diretório como argumento"
+        exit 1
+    fi
+
+    #print final
     echo "SIZE NAME $(date +%Y%m%d) $@"
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
@@ -127,3 +137,4 @@ function main() {
 }
 
 main "$@"
+unset IFS
