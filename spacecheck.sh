@@ -28,13 +28,9 @@ function input() {
     while getopts ":n:r:a:d:s:l" flag; do
         case $flag in
             n)  
-                expressao=$OPTARG
-                #isto é para o print
-                dat=$(stat -c "%y" "$dir" | cut -d ' ' -f1)
-                size=$(du -sh "$dir" | awk '{print $1}')            # Use o comando stat para obter informações detalhadas sobre o arquivo
-                printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$dat" "$oper"
-                find "$dir" -type d -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
-                find "$dir" -type f -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}'
+                if [ -n "$OPTARG" ]; then
+                    expressao=$OPTARG
+                fi
                 ;;
             r)  
                 reverse=1
@@ -79,49 +75,54 @@ function input() {
 }
 
 function space() {
-    dires=$(find "$1" -type d )
+    dires=($(find "$1" -type d))
 
     for i in "${dires[@]}"; do
-        total_space="0"
-        files=$(find "$dires" -type f -size "$minimo" -name "$expressao")
+        total_space=0
+        files=($(find "$i" -type f -size +$minimo -name "$expressao"))
 
         for k in "${files[@]}"; do
             if [[ ! -d "$k" ]]; then
-                space=$(du "$k" | awk {print $1} | grep -oE '[0-9.]+')
+                space=$(du "$k" | awk '{print $1}' | grep -oE '[0-9.]+')
+                total_space=$(echo "$total_space + $space" | bc)
             fi
-            total_space=$(echo "$total_space + $space" | bc)
         done
 
-        #guardar o valor num array
+        # Save the value in an array
         space_array[$i]="$total_space"
     done 
 }
 
 function print() {
-    #utilizar o head -n para delimitar o numero de linhas da tabela
-    :'
+    # Use head -n to limit the number of lines in the table
     echo "SIZE NAME $(date +%Y%m%d) $@"
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
-
+            for val in "${!space_array[@]}"; do
+                echo "${space_array[$val]} $val"
+            done | sort -rn -k1,1 -k2,2
         else
-
+            for val in "${!space_array[@]}"; do
+                echo "${space_array[$val]} $val"
+            done | sort -rn
         fi
     else
         if [[ $sort_name -eq 1 ]]; then
-
+            for val in "${!space_array[@]}"; do
+                echo "${space_array[$val]} $val"
+            done | sort -k2,2r -k1,1n
         else
-
+            for val in "${!space_array[@]}"; do
+                echo "${space_array[$val]} $val"
+            done
         fi
     fi
-    '
-    return 0
 }
 
 function main() {
     input "$@"
     directories "$@"
-    
+    print
 }
 
 main "$@"
