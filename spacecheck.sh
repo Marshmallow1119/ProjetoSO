@@ -14,7 +14,7 @@ declare validation='^[0-9]+$'
 declare date
 
 #declaração de arrays
-declare -a space_array
+declare -A space_array
 
 function directories() {          #verifica quais dos argumentos são diretotias
     for i in "$@"; do
@@ -80,7 +80,6 @@ function input() {
 
 function space() {
     dires=$(find "$1" -type d )
-    index=0
 
     for i in "${dires[@]}"; do
         total_space="0"
@@ -88,14 +87,13 @@ function space() {
 
         for k in "${files[@]}"; do
             if [[ ! -d "$k" ]]; then
-                space=$(du "$k" | grep -oE '[0-9.]+')
+                space=$(du "$k" | awk {print $1} | grep -oE '[0-9.]+')
             fi
             total_space=$(echo "$total_space + $space" | bc)
         done
 
         #guardar o valor num array
-        space_array[$index]="$total_space"
-        ((index++))
+        space_array[$i]="$total_space"
     done 
 }
 
@@ -121,8 +119,9 @@ function print() {
 }
 
 function main() {
-    directories "$@"
     input "$@"
+    directories "$@"
+    
 }
 
 main "$@"
