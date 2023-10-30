@@ -11,7 +11,7 @@ declare expressao="*"
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
 declare validation='^[0-9]+$'
-declare date=0
+declare input_date=0
 
 #declaração de arrays
 declare -A space_array
@@ -25,7 +25,7 @@ function directories() {          #verifica quais dos argumentos são diretotias
 }
 
 function input() {                                                                                            
-    while getopts ":n:r:a:d:s:l" flag; do
+    while getopts "n:rad:s:l:" flag; do
         case $flag in
             n)  
                 if [ -n "$OPTARG" ]; then
@@ -41,7 +41,7 @@ function input() {
             d)  
                 #verifica se a data é válida
                 if date -d "$OPTARG" >/dev/null 2>&1; then
-                    date=$OPTARG
+                    input_date=$OPTARG
                 else
                     echo "Data inválida"
                     exit 1
@@ -102,21 +102,21 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -rn -k1,1 -k2,2
+            done | sort -rn -k1,1 -k2,2 | head -n "$limite"
         else
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -rn
+            done | sort -rn | head -n "$limite"
         fi
     else
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -k2,2r -k1,1n
+            done | sort -k2,2 -r -k1,1 | head -n "$limite"
         else
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done
+            done | head -n "$limite"
         fi
     fi
 }
