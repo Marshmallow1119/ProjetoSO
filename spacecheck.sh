@@ -4,14 +4,14 @@
 #Tomás Brás        112665
 
 #declaração de variaveis
-declare total_space
-declare minimo
-declare limite
-declare expressao
+declare total_space=0
+declare minimo=0
+declare limite=10000
+declare expressao="*"
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
 declare validation='^[0-9]+$'
-declare date
+declare date=0
 
 #declaração de arrays
 declare -A space_array
@@ -79,7 +79,7 @@ function space() {
 
     for i in "${dires[@]}"; do
         total_space=0
-        files=($(find "$i" -type f -name "$expressao"))
+        files=($(find "$i" -type f -name "$expressao" ! -newermt "$date"))
 
         for k in "${files[@]}"; do
             if [[ ! -d "$k" ]]; then
@@ -91,7 +91,7 @@ function space() {
         done
 
         # Save the value in an array
-        space_array[$i]="$total_space"
+        space_array["$i"]=$total_space
     done 
 }
 
