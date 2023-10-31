@@ -13,12 +13,13 @@ declare found=0                 #caminho encontrado no A
 declare limite=10000
 declare expressao="*"
 declare space_dif=0
+declare arrayA_filled=0
+declare arrayB_filled=0
 
 #declaração de arrays
 declare -A space_arrayA
 declare -A space_arrayB 
 declare -A space_arrayfinal
-
 
 #verifica quais dos argumentos são ficheiros
 function files() {    
@@ -50,95 +51,80 @@ function input() {
 }
 
 function space() {
-    space_dif=0
+    local file="$1"
+    local temp_file=$(mktemp)  # Cria um arquivo temporário
 
-    if [ ${#space_arrayA[*]} -eq 0 ]; then
-        tail -n +2 "$1" | while IFS=' ' read -r -d '' size locat ; do
-            space_arrayA["$size"]=$locat
-        done 
+    tail -n +2 "$file" > "$temp_file"
+
+    if [ $arrayA_filled -eq 0 ]; then
+        while IFS=' ' read -r size locat; do
+            space_arrayA["$locat"]=$size
+        done < "$temp_file"
+        arrayA_filled=1
     else
-        tail -n +2 "$1" | while IFS=' ' read -r -d '' size locat ; do
-            space_arrayB["$size"]=$locat
-        done 
-        echo "adoro tudo"
+        while IFS=' ' read -r size locat; do
+            space_arrayB["$locat"]=$size
+        done < "$temp_file"
+        arrayB_filled=1
     fi
-
-
+    
     found=0
-    if [ ${#space_arrayB[*]} -ne 0 ]; then
-        for first1 in "${!space_arrayA[@]}"; do
-            echo "$first1"
-            for first2 in "${!space_arrayB[@]}"; do
-                echo "$first2"
-                if [ "$first1" == "$first2" ]; then
-                    spacedif=$((space_arrayB[$first2] - space_arrayA[$first1]))
-                    space_arrayfinal[$first1]=$spacedif
-                    echo "$spacedif"
-                    break
-                else 
-                    found=1;
-                fi
-            done
+    rm "$temp_file"  # Remove o arquivo temporário
 
-            if [[ $found -eq 1 ]]; then
-                spacedif=$(space_arrayA[$first1])
-                modify_first="$caminhoB-NEW"
+    if [ $arrayB_filled -eq 1 ]; then
+    found=0 
+
+        for first1 in "${!space_arrayA[@]}"; do
+            tamanho="${space_arrayA[$first1]}"
+
+            if [[ -n ${space_arrayB[$first1]} ]]; then
+                spacedif=$((space_arrayB[$first1] - tamanho))
+                space_arrayfinal[$first1]=$spacedif
+            else
+                modify_first="$first1-NEW"
+                space_arrayfinal[$modify_first]=$tamanho
+            fi
+        done
+
+        for first2 in "${!space_arrayB[@]}"; do
+            if [[ -z ${space_arrayA[$first2]} ]]; then
+                spacedif=${space_arrayB[$first2]}
+                modify_first="$first2-REMOVED"
                 space_arrayfinal[$modify_first]=$spacedif
             fi
         done
     fi
-
-    found=0
-
-    for first2 in "${!space_arrayA[@]}"; do
-        for first1 in "${!space_arrayB[@]}"; do
-            if [ "$first2" == "$first1" ]; then
-                spacedif=$((space_arrayB[$first1] - space_arrayA[$first2]))
-                space_arrayfinal[$first2]=$spacedif
-                break
-            else 
-                found=1;
-            fi
-        done
-        if [[ $found -eq 1 ]]; then
-            spacedif=$(space_arrayB[$first2])
-            modify_first="$caminhoB-REMOVED"
-            space_arrayfinal[$modify_first]=$spacedif
-        fi
-    done
-    echo "${space_Arrayfinal[@]}"
 }
-    
 
 function print() {
-    if [[ "${#space_arrayfinal[@]}" -eq 0 ]]; then 
+    if [[ "${#space_arrayfinal[@]}" -eq 0 ]]; then
         echo "Precisa de passar dois ficheiros como argumento"
         exit 1
     fi
-    #print final
-    printf "%-10s %-10s\n" "SIZE" "NAME" 
+    printf "%-5s %s\n" "SIZE" "NAME"
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
-                echo "${space_arrayfinal[$val]} $val"
+                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
             done | sort -k2,2r
         else
             for val in "${!space_arrayfinal[@]}"; do
-                echo "${space_arrayfinal[$val]} $val"
+                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
             done | sort -k1,1n
         fi
     else
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
-                echo "${space_arrayfinal[$val]} $val"
-            done | sort -k2,2 
+                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
+            done | sort -k2,2
         else
             for val in "${!space_arrayfinal[@]}"; do
-                echo "${space_arrayfinal[$val]} $val"
+                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
             done | sort -k1,1nr
         fi
     fi
 }
+
 
 function main() {
     input "$@"
