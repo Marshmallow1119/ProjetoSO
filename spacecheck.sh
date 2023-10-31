@@ -85,6 +85,7 @@ function space() {
     while IFS= read -r -d '' dir; do
         total_space=0
         while IFS= read -r -d '' file; do
+
             if [[ ! -d "$file" ]]; then
                 space=$(du "$file" | awk '{print $1}' | grep -oE '[0-9.]+')
                 if [[ $space -ge $minimo ]]; then
@@ -111,7 +112,7 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -k2,2r | head -n "$limite"
+            done | sort -k2,100r | head -n "$limite"
         else
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
@@ -121,7 +122,7 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
-            done | sort -k2,2 | head -n "$limite"
+            done | sort -k2,100 | head -n "$limite"
         else
             for val in "${!space_array[@]}"; do
                 echo "${space_array[$val]} $val"
