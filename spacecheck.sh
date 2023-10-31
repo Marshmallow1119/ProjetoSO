@@ -87,6 +87,14 @@ function space() {
     while IFS= read -r -d '' dir; do
         total_space=0
         while IFS= read -r -d '' file; do
+            
+            #verifica se o diretorio impossível de aceder ou determinar o tamanho dos seus ficheiros 
+            find "$dir" -type f -name "$expressao" ! -newermt "@$input_date" -print0 >/dev/null 2>&1
+            result=$?
+            if [[ $result -eq 1 ]]; then
+                space_array["$dir"]="NA"
+                continue
+            fi
 
             if [[ ! -d "$file" ]]; then
                 space=$(du "$file" | awk '{print $1}' | grep -oE '[0-9.]+')
