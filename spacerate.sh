@@ -10,7 +10,6 @@ declare -A value1
 declare -A value2
 declare -A value3
 declare found=0                 #caminho encontrado no A
-declare limite=10000
 declare expressao="*"
 declare space_dif=0
 declare arrayA_filled=0
