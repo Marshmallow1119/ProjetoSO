@@ -10,7 +10,6 @@ declare -A value1
 declare -A value2
 declare -A value3
 declare found=0                 #caminho encontrado no A
-declare limite=10000
 declare expressao="*"
 declare space_dif=0
 
@@ -121,7 +120,7 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
                 echo "${space_arrayfinal[$val]} $val"
-            done | sort -k2,2r
+            done | sort -k2,100r
         else
             for val in "${!space_arrayfinal[@]}"; do
                 echo "${space_arrayfinal[$val]} $val"
@@ -131,7 +130,7 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
                 echo "${space_arrayfinal[$val]} $val"
-            done | sort -k2,2 
+            done | sort -k2,100 
         else
             for val in "${!space_arrayfinal[@]}"; do
                 echo "${space_arrayfinal[$val]} $val"
