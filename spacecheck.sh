@@ -33,6 +33,7 @@ function input() {
     while getopts "n:rad:s:l:" flag; do
         case $flag in
             n)  
+                #verifica se a string tem comprimento maior que zero
                 if [ -n "$OPTARG" ]; then
                     expressao=$OPTARG
                 fi
@@ -70,6 +71,7 @@ function input() {
                 fi
                 ;;
             *)
+                #caso seja passado um argumento não válido
                 echo "Opção inválida! A sair..."
                 exit 1
                 ;;
