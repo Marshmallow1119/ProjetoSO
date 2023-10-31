@@ -16,7 +16,7 @@ declare validation='^[0-9]+$'
 declare date
 
 #declaração de arrays
-declare -a space_array
+declare -A space_array
 
 function directories() {  
     if [ $@ -gt 0 ]; then        #verifica quais dos argumentos são diretotias
@@ -98,41 +98,40 @@ function space() {
 
     for i in "${dires[@]}"; do
         total_space="0"
+        spacedir=$(du -sh "$i" | awk '{print $1}')
+        space_array["$i"]=$spacedir
         files=$(find "$dires" -type f -size "$minimo" -name "$expressao")
 
         for k in "${files[@]}"; do
             if [[ ! -d "$k" ]]; then
-                space=$(du "$k" | grep -oE '[0-9.]+')
-            fi
-            total_space=$(echo "$total_space + $space" | bc)
+                space=$(du -b "$k" | awk '{print $1}')
+                total_space=$((total_space + space))
+                space_array["$k"]=$space
+        fi
         done
-
-        #guardar o valor num array
-        space_array[$index]="$total_space"
-        ((index++))
     done 
 }
 
 function print() {
     #utilizar o head -n para delimitar o numero de linhas da tabela
     printf "%-10s %-10s %-10s %-10s\n" "SIZE" "NAME" "$(date +%Y%m%d)" "$@"
-    if [[ "$#" -ne  0]]; then
-        if [[ $reverse -eq 1 ]]; then
-            if [[ $sort_name -eq 1 ]]; then
-                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn -k1,1 -k2,2
+    for doc in "${!space_array[@]}"; do
+        size="${space_array[$doc]}"
+            if [[ $reverse -eq 1 ]]; then
+                if [[ $sort_name -eq 1 ]]; then
+                    find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn -k1,1 -k2,2
+                else
+                    find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn
+                fi
             else
-                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -rn
-            fi
-        else
-            if [[ $sort_name -eq 1 ]]; then
-                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -k2,2r -k1,1n
-            else
-                find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' 
-            fi
-    else 
-        
-        exit 1
-    fi
+                if [[ $sort_name -eq 1 ]]; then
+                    find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' | sort -k2,2r -k1,1n
+                else
+                    find "$dir" \( -type d -o -type f \) -exec du -k {} \; | awk '{file=$2; sub(/\.[^.]+$/, "", file); printf "%-10s %-10s\n", $1, file}' 
+                fi
+            
+    done
+    
     return 0
 }
 
