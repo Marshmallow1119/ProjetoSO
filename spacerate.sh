@@ -51,51 +51,63 @@ function input() {
 
 function space() {
     space_dif=0
+
     if [ ${#space_arrayA[*]} -eq 0 ]; then
-        sed -i '1d' "$filename"
-        while IFS=' ' read -r size locat ; do
+        tail -n +2 "$1" | while IFS=' ' read -r -d '' size locat ; do
             space_arrayA["$size"]=$locat
-            done < "$filename"
+        done 
     else
-        sed -i '1d' "$filename"
-        while IFS=' ' read -r size locat ; do
+        tail -n +2 "$1" | while IFS=' ' read -r -d '' size locat ; do
             space_arrayB["$size"]=$locat
-            done < "$filename"
+        done 
+        echo "adoro tudo"
     fi
 
-    for first1 in "${space_arrayA[@]}"; do
-        for first2 in "${space_arrayB[@]}"; do
-            if [ "$first1" == "$first2" ]; then
-                spacedif+=$((space_arrayB[$first1] - space_arrayA[$first2]))
-                space_arrayfinal[$first1]=$spacedif
-                break
-            else 
-                found=1;
-            fi
-        done
-    if[[$found==1]]; then
-        spacedif+=$((space_arrayB[$first1] - space_arrayA[$first2]))
-        modify_first="$caminhoB-NEW"
-        space_arrayfinal[$modify_first]=$spacedif
-    li
-    done
+
     found=0
-    for first2 in "${space_arrayA[@]}"; do
-        for first1 in "${space_arrayB[@]}"; do
-            if [ "$first1" == "$first2" ]; then
-                spacedif+=$((space_arrayB[$first1] - space_arrayA[$first2]))
-                space_arrayfinal[$first1]=$spacedif
+    if [ ${#space_arrayB[*]} -ne 0 ]; then
+        for first1 in "${!space_arrayA[@]}"; do
+            echo "$first1"
+            for first2 in "${!space_arrayB[@]}"; do
+                echo "$first2"
+                if [ "$first1" == "$first2" ]; then
+                    spacedif=$((space_arrayB[$first2] - space_arrayA[$first1]))
+                    space_arrayfinal[$first1]=$spacedif
+                    echo "$spacedif"
+                    break
+                else 
+                    found=1;
+                fi
+            done
+
+            if [[ $found -eq 1 ]]; then
+                spacedif=$(space_arrayA[$first1])
+                modify_first="$caminhoB-NEW"
+                space_arrayfinal[$modify_first]=$spacedif
+            fi
+        done
+    fi
+
+    found=0
+
+    for first2 in "${!space_arrayA[@]}"; do
+        for first1 in "${!space_arrayB[@]}"; do
+            if [ "$first2" == "$first1" ]; then
+                spacedif=$((space_arrayB[$first1] - space_arrayA[$first2]))
+                space_arrayfinal[$first2]=$spacedif
                 break
             else 
                 found=1;
             fi
         done
-    if[[$found==1]]; then
-        spacedif+=$((space_arrayB[$first1] - space_arrayA[$first2]))
-        modify_first="$caminhoB-REMOVED"
-        space_arrayfinal[$modify_first]=$spacedif
-    li
+        if [[ $found -eq 1 ]]; then
+            spacedif=$(space_arrayB[$first2])
+            modify_first="$caminhoB-REMOVED"
+            space_arrayfinal[$modify_first]=$spacedif
+        fi
     done
+    echo "${space_Arrayfinal[@]}"
+}
     
 
 function print() {
@@ -107,7 +119,7 @@ function print() {
     printf "%-10s %-10s\n" "SIZE" "NAME" 
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
-         for val in "${!space_arrayfinal[@]}"; do
+            for val in "${!space_arrayfinal[@]}"; do
                 echo "${space_arrayfinal[$val]} $val"
             done | sort -k2,2r
         else
@@ -124,6 +136,8 @@ function print() {
             for val in "${!space_arrayfinal[@]}"; do
                 echo "${space_arrayfinal[$val]} $val"
             done | sort -k1,1nr
+        fi
+    fi
 }
 
 function main() {
@@ -133,3 +147,4 @@ function main() {
 }
 
 main "$@"
+unset IFS
