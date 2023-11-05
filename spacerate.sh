@@ -65,11 +65,10 @@ function space() {
 
     rm "$temp_file"  # Remove o arquivo temporário
 
-    if [ $arrayB_filled -eq 1 ]; then
+    if [ "$arrayA_filled" -eq 1 ] && [ "$arrayB_filled" -eq 1 ]; then
 
         for first1 in "${!space_arrayA[@]}"; do
             tamanho="${space_arrayA[$first1]}"
-
             if [[ -n ${space_arrayB[$first1]} ]]; then
                 spacedif=$((space_arrayB[$first1] - tamanho))
                 space_arrayfinal[$first1]=$spacedif
