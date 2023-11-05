@@ -6,7 +6,6 @@
 #declaração de variaveis
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
-declare found=0                 #caminho encontrado no A
 declare expressao="*"
 declare space_dif=0
 declare arrayA_filled=0
@@ -63,12 +62,10 @@ function space() {
         done < "$temp_file"
         arrayB_filled=1
     fi
-    
-    found=0
+
     rm "$temp_file"  # Remove o arquivo temporário
 
     if [ $arrayB_filled -eq 1 ]; then
-    found=0 
 
         for first1 in "${!space_arrayA[@]}"; do
             tamanho="${space_arrayA[$first1]}"
