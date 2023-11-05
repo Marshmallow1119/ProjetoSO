@@ -6,9 +6,6 @@
 #declaração de variaveis
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
-declare -A value1
-declare -A value2
-declare -A value3
 declare found=0                 #caminho encontrado no A
 declare expressao="*"
 declare space_dif=0
