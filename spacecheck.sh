@@ -91,7 +91,7 @@ function space() {
             #verifica se o diretorio impossível de aceder ou determinar o tamanho dos seus ficheiros 
             find "$dir" -type f -name "$expressao" ! -newermt "@$input_date" -print0 >/dev/null 2>&1
             result=$?
-            if [[ $result -eq 1 ]]; then
+            if [[ $result -ne 0 ]]; then
                 space_array["$dir"]="NA"
                 continue
             fi
