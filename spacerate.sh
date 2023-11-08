@@ -25,7 +25,7 @@ function files() {
 }
 
 function input() {                                                                          
-    while getopts ":n:r:a:d:s:l" flag; do
+    while getopts "ra" flag; do
         case $flag in
 
             r)  
