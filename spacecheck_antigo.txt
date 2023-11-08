@@ -1,0 +1,6 @@
+SIZE NAME 20231108 test_a1
+66806 test_a1
+66508 test_a1/test_a1
+40368 test_a1/test_a1/aaa
+9544 test_a1/test_a1/rrr
+7240 test_a1/test_a1/aaa/zzzz
