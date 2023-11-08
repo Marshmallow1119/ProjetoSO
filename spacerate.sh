@@ -27,7 +27,6 @@ function files() {
 function input() {                                                                          
     while getopts "ra" flag; do
         case $flag in
-
             r)  
                 reverse=1
                 ;;
@@ -94,10 +93,11 @@ function space() {
 }
 
 function print() {
-    if [[ "${#space_arrayfinal[@]}" -eq 0 ]]; then
+    if [[ "${#space_arrayfinal[@]}" -eq 0 || "$#" -ne 2]]; then
         echo "Precisa de passar dois ficheiros como argumento"
         exit 1
     fi
+
     echo -e "SIZE NAME"
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
