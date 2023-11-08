@@ -97,7 +97,7 @@ function space() {
             fi
 
             if [[ ! -d "$file" ]]; then
-                space=$(du "$file" | awk '{print $1}' | grep -oE '[0-9.]+')
+                space=$(du -b "$file" | awk '{print $1}' | grep -oE '[0-9.]+')
                 if [[ $space -ge $minimo ]]; then
                     total_space=$(echo "$total_space + $space" | bc)
                 fi
