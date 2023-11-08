@@ -6,7 +6,6 @@
 #declaração de variaveis
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
-declare expressao="*"
 declare space_dif=0
 declare arrayA_filled=0
 declare arrayB_filled=0
@@ -36,9 +35,9 @@ function input() {
                 sort_name=1
                 ;;
             *)
-                if [ -n "$OPTARG" ]; then
-                    expressao=$OPTARG
-                fi
+                #caso seja passado um argumento não válido
+                echo "Opção inválida! A sair..."
+                exit 1
                 ;;
         esac
     done
