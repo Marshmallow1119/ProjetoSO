@@ -1,5 +1,5 @@
-66806 test_a1
-66508 test_a1/test_a1
+6606 test_a1
+6650 test_a1/test_a1
 40368 test_a1/test_a1/aaa
 9544 test_a1/test_a1/rrr
 2000 test_a1/tomas

@@ -57,12 +57,12 @@ function space() {
     fi
 
     if [ $arrayA_filled -eq 0 ]; then
-        while IFS=' ' read -r size locat; do
+        while IFS=' ' read -r size locat || [ -n "$size" ]; do
             space_arrayA["$locat"]=$size
         done < "$temp_file"
         arrayA_filled=1
     else
-        while IFS=' ' read -r size locat; do
+        while IFS=' ' read -r size locat || [ -n "$size" ]; do
             space_arrayB["$locat"]=$size
         done < "$temp_file"
         arrayB_filled=1
@@ -73,23 +73,22 @@ function space() {
     if [ "$arrayA_filled" -eq 1 ] && [ "$arrayB_filled" -eq 1 ]; then
 
         for first1 in "${!space_arrayA[@]}"; do
-            echo "$first1-1"
             tamanho="${space_arrayA[$first1]}"
             if [[ -n ${space_arrayB[$first1]} ]]; then
-                spacedif=$((space_arrayB[$first1] - tamanho))
+                tama="${space_arrayB[$first1]}"
+                spacedif=$((tama - tamanho))
                 space_arrayfinal[$first1]=$spacedif
             else
                 modify_first="$first1-NEW"
-                space_arrayfinal[$modify_first]=$tamanho
+                space_arrayfinal["$modify_first"]=$tamanho
             fi
         done
 
         for first2 in "${!space_arrayB[@]}"; do
-            echo "$first2-2"
             if [[ -z ${space_arrayA[$first2]} ]]; then
                 spacedif=${space_arrayB[$first2]}
                 modify_first="$first2-REMOVED"
-                space_arrayfinal[$modify_first]=$spacedif
+                space_arrayfinal["$modify_first"]=$(( -1 * ${space_arrayB[$first2]} ))
             fi
         done
     fi
