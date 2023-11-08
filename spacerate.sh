@@ -77,7 +77,7 @@ function space() {
                 spacedif=$((tama - tamanho))
                 space_arrayfinal[$first1]=$spacedif
             else
-                modify_first="$first1-NEW"
+                modify_first="$first1 NEW"
                 space_arrayfinal["$modify_first"]=$tamanho
             fi
         done
@@ -85,7 +85,7 @@ function space() {
         for first2 in "${!space_arrayB[@]}"; do
             if [[ -z ${space_arrayA[$first2]} ]]; then
                 spacedif=${space_arrayB[$first2]}
-                modify_first="$first2-REMOVED"
+                modify_first="$first2 REMOVED"
                 space_arrayfinal["$modify_first"]=$(( -1 * ${space_arrayB[$first2]} ))
             fi
         done
@@ -93,7 +93,7 @@ function space() {
 }
 
 function print() {
-    if [[ "${#space_arrayfinal[@]}" -eq 0 || "$#" -ne 2]]; then
+    if [[ "${#space_arrayfinal[@]}" -eq 0 ]]; then
         echo "Precisa de passar dois ficheiros como argumento"
         exit 1
     fi
