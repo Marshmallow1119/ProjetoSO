@@ -36,6 +36,9 @@ function input() {
                 #verifica se a string tem comprimento maior que zero
                 if [ -n "$OPTARG" ]; then
                     expressao=$OPTARG
+                else
+                    echo "Expressão inválida"
+                    exit 1
                 fi
                 ;;
             r)  
