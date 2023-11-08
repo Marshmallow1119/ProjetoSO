@@ -1,3 +1,0 @@
-dsadsad 
-sadasd
-dsogçu-sadasd 
