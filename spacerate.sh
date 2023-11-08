@@ -49,7 +49,12 @@ function space() {
     local file="$1"
     local temp_file=$(mktemp)  # Cria um arquivo temporário
 
-    tail -n +2 "$file" > "$temp_file"
+    if [[ $(head -n 1 "$file") == "SIZE"* ]]; then
+        tail -n +2 "$file" > "$temp_file"
+    else
+        # Caso a primeira linha não comece com "SIZE", apenas copie o arquivo original
+        cp "$file" "$temp_file"
+    fi
 
     if [ $arrayA_filled -eq 0 ]; then
         while IFS=' ' read -r size locat; do
@@ -68,6 +73,7 @@ function space() {
     if [ "$arrayA_filled" -eq 1 ] && [ "$arrayB_filled" -eq 1 ]; then
 
         for first1 in "${!space_arrayA[@]}"; do
+            echo "$first1-1"
             tamanho="${space_arrayA[$first1]}"
             if [[ -n ${space_arrayB[$first1]} ]]; then
                 spacedif=$((space_arrayB[$first1] - tamanho))
@@ -79,6 +85,7 @@ function space() {
         done
 
         for first2 in "${!space_arrayB[@]}"; do
+            echo "$first2-2"
             if [[ -z ${space_arrayA[$first2]} ]]; then
                 spacedif=${space_arrayB[$first2]}
                 modify_first="$first2-REMOVED"
@@ -93,28 +100,29 @@ function print() {
         echo "Precisa de passar dois ficheiros como argumento"
         exit 1
     fi
-    printf "%-5s %s\n" "SIZE" "NAME"
+    echo -e "SIZE NAME"
     if [[ $reverse -eq 1 ]]; then
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
-                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
+                echo -e "${space_arrayfinal[$val]} $val"
             done | sort -k2,2r
         else
             for val in "${!space_arrayfinal[@]}"; do
-                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
+                echo -e "${space_arrayfinal[$val]} $val"
             done | sort -k1,1n
         fi
     else
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
-                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
+                echo -e "${space_arrayfinal[$val]} $val"
             done | sort -k2,2
         else
             for val in "${!space_arrayfinal[@]}"; do
-                printf "%-5s %s\n" "${space_arrayfinal[$val]}" "$val"
+                echo -e "${space_arrayfinal[$val]} $val"
             done | sort -k1,1nr
         fi
     fi
+
 }
 
 
