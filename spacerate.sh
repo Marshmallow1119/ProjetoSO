@@ -6,7 +6,7 @@
 #declaração de variaveis
 declare reverse=0               #ordenação normal
 declare sort_name=0             #ordenação default dos ficheiros
-declare space_dif=0
+declare spacedif=0
 declare arrayA_filled=0
 declare arrayB_filled=0
 
