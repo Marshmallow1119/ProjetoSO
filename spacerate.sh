@@ -104,7 +104,7 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
                 echo -e "${space_arrayfinal[$val]} $val"
-            done | sort -k2,2r
+            done | sort -k2,100r
         else
             for val in "${!space_arrayfinal[@]}"; do
                 echo -e "${space_arrayfinal[$val]} $val"
@@ -114,7 +114,7 @@ function print() {
         if [[ $sort_name -eq 1 ]]; then
             for val in "${!space_arrayfinal[@]}"; do
                 echo -e "${space_arrayfinal[$val]} $val"
-            done | sort -k2,2
+            done | sort -k2,100
         else
             for val in "${!space_arrayfinal[@]}"; do
                 echo -e "${space_arrayfinal[$val]} $val"
