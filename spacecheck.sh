@@ -19,7 +19,7 @@ IFS=$'\n'
 #declaração de arrays
 declare -A space_array
 
-#verifica quais dos argumentos são diretotias
+#verifica quais dos argumentos são diretorias
 function directories() {          
     for i in "$@"; do
         if [[ -d "$i" ]]; then

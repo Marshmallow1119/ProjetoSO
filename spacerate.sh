@@ -74,7 +74,7 @@ function space() {
             tamanho="${space_arrayA[$first1]}"
             if [[ -n ${space_arrayB[$first1]} ]]; then
                 tama="${space_arrayB[$first1]}"
-                spacedif=$((tama - tamanho))
+                spacedif=$((tamanho-tama))
                 space_arrayfinal[$first1]=$spacedif
             else
                 modify_first="$first1 NEW"
